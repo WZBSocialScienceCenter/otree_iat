@@ -36,7 +36,7 @@ You can install the exact requirements using *pip*: `pip install -r requirements
 
 ## Configuration
 
-### Prime and target images
+### Stimuli and trial blocks
 
 For your own experiment, you probably want to exchange the stimuli and adjust the trials. You can do so in `iat/models.py` by editing `STIMULI`, `STIMULI_LABELS` and `BLOCKS`.
 
