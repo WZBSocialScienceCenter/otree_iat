@@ -1,0 +1,353 @@
+{% extends "iat/Page.html" %}
+{% load otree static %}
+
+{# Implicit Association Test IAT experiment #}
+{# November 2019, Markus Konrad <markus.konrad@wzb.eu> #}
+
+
+{% block app_styles %}
+
+{{ block.super}}
+
+<style>
+
+.otree-btn-next {
+    display: none;
+}
+
+#progress_container {
+    width: 100%;
+    height: 20px;
+    margin-bottom: 2em;
+}
+
+#progress_bar_container {
+    width: 80%;
+    height: 20px;
+    border: 1px solid black;
+    float: right;
+}
+
+#progress_bar {
+    width: 0;
+    height: 18px;
+    background: darkgray;
+}
+
+
+#key_instructions {
+    width: 100%;
+}
+
+#key_instructions .left {
+    width: 50%;
+    float: left;
+}
+
+#key_instructions .right {
+    width: 50%;
+    float: left;
+    text-align: right;
+}
+
+#key_instructions .press_key {
+    color: gray;
+    margin: 0;
+}
+
+#key_instructions .class,
+#key_instructions .conj {
+    font-size: 1.7em;
+    margin: 0;
+}
+
+#key_instructions .class {
+    font-weight: bold;
+}
+
+#start_instructions {
+    margin-top: 3em;
+}
+
+#start_instructions h3 {
+    text-align: center;
+    font-size: 1em;
+    text-decoration: underline;
+    font-weight: normal;
+}
+
+#stimulus, #feedback, #submit_data_notice {
+    display: none;
+    margin: auto;
+    width: 50%;
+    text-align: center;
+}
+
+#stimulus {
+    font-weight: bold;
+    font-size: 3em;
+    margin-top: 1.5em;
+}
+
+#feedback .red_x {
+    font-size: 6em;
+}
+
+.class.attributes {
+    color: darkblue;
+}
+
+.class.concepts {
+    color: darkgreen;
+}
+
+.red_x {
+    font-weight: bold;
+    color: red;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+{# submit data is stored in these hidden inputs as comma separated values strings #}
+<input id="input_trial_ids" name="trial_ids" type="hidden" value="">
+<input id="input_responses" name="responses" type="hidden" value="">
+<input id="input_response_correct" name="responses_correct" type="hidden" value="">
+<input id="input_response_times" name="response_times" type="hidden" value="">
+
+<div id="progress_container">
+    Progress:
+    <div id="progress_bar_container">
+        <div id="progress_bar"></div>
+    </div>
+    <div style="clear: right"></div>
+</div>
+
+<div id="key_instructions">
+    {% for side in instructions %}
+        <div class="{{ side.side }}">
+            <p class="press_key">Press <span class="key">{{ side.key }}</span> for</p>
+            {% for class in side.classes %}
+                <p class="class {{ class.class }}">{{ class.label }}</p>
+                {% if side.classes|length > 1 and not forloop.last %}
+                    <p class="conj">or</p>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+
+<div style="clear:left"></div>
+
+<div id="submit_data_notice">Data is being transmitted...</div>
+
+<div id="stimulus" class="class names"></div>
+
+<div id="feedback">
+    <p class="red_x">X</p>
+    <p class="hint">Press the other key to continue.</p>
+</div>
+
+<div id="start_instructions">
+    <h3>Part {{ player.round_number }} of {{ Constants.num_rounds }}</h3>
+
+
+    {% if player.round_number == 1 %}
+        <p>
+            Put your index finger on the keys <span class="key">{{ Constants.capture_keycodes.left.1 }}</span>
+            and <span class="key">{{ Constants.capture_keycodes.right.1 }}</span> to be able to react quickly.
+        </p>
+    {% endif %}
+
+    {% if block_def.notice %}
+        <p style="font-weight: bold">{{ block_def.notice }}</p>
+    {% endif %}
+
+    <p class="keys">
+        {% for side in instructions %}
+            Press <span class="key">{{ side.key }}</span> for words, that belong to the
+            {% if side.classes|length == 1  %}category{% else %}categories{% endif %}
+
+            {% for class in side.classes %}
+                <span class="class {{ class.class }}">{{ class.label }}</span>
+                {% if side.classes|length > 1 and not forloop.last %}
+                    or
+                {% endif %}
+            {% endfor %}
+
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+    </p>
+
+    {% if player.round_number == 1 %}
+        <p>We will display one word after another.</p>
+    {% endif %}
+
+    <p>
+        When you make a mistake, a red <span class="red_x">X</span> will appear. Press the other key to continue.<br>
+
+        Try to match the words <span style="text-decoration: underline">as quickly as possible</span>.
+    </p>
+
+    <p style="text-align: center">
+        Press <span class="key">SPACE</span>, in order to start with part {{ player.round_number }}.
+    </p>
+
+    {% next_button %}
+</div>
+
+<script>
+var KEYCODES_SIDES = {{ keycodes_sides|json }};
+var SIDES_KEYCODES = {{ sides_keycodes|json }};
+var STIMULUS_LEVEL_SIDES = {{ stimulus_level_sides|json }};
+
+var phase = 0;    // can be: 0 = start, 1 = trials, 2 = end
+var expect_keycode = null;
+
+// create array of trial data: each row contains trial ID, trial stimulus, stimulus class (words/names), stimulus
+// level (e.g pos/neg or tr/dt)
+var trials = [
+    {% for t in trials %}
+        [{{ t.pk }}, '{{ t.stimulus }}', '{{ t.stimulus_class }}', '{{ t.stimulus_level }}'],
+    {% endfor %}
+];
+
+var n_trials = trials.length;
+var cur_trial_idx = 0;    // state variable: current index into `trials`
+var input_start_time = 0;
+
+// collected data for each trial:
+var trial_ids = [];
+var response_keys = [];
+var response_times = [];
+var response_correct = [];
+
+
+$(function () {
+    document.onkeydown = function (event) {
+        event.preventDefault();
+    };
+
+    document.onkeyup = function (event) {
+        event.preventDefault();
+
+        if (phase === 0) { // start
+            if (event.keyCode === 32) {
+                $('#start_instructions').hide();
+                advanceProgressBar();
+                nextTrial();
+                phase++;
+            }
+        } else if (phase === 1) {  // trials
+            if (input_start_time === 0 && expect_keycode !== null && event.code === expect_keycode) {
+                expect_keycode = null;   // reset
+                prepareNextTrial();
+            } else if (input_start_time !== 0 && expect_keycode === null) {
+                if (event.code in KEYCODES_SIDES) {  // only do something if they key should be recorded
+                    // calculate response time
+                    var reaction_ms = new Date().getTime() - input_start_time;
+                    input_start_time = 0;   // reset
+
+                    var trial = trials[cur_trial_idx];
+                    var response_side = KEYCODES_SIDES[event.code];
+                    var trial_side = STIMULUS_LEVEL_SIDES[trial[2]][trial[3]];
+                    var correct = response_side === trial_side;
+
+                    console.log('key captured: ' + event.code + ' (' + response_side + ') after ' + reaction_ms +
+                        'ms; correct: ' + correct);
+
+                    trial_ids.push(trial[0]);
+                    response_keys.push(event.code);
+                    response_times.push(reaction_ms);
+                    response_correct.push(Number(correct));
+
+                    if (correct) {
+                        prepareNextTrial();
+                    } else {
+                        expect_keycode = SIDES_KEYCODES[trial_side];
+                        $('#feedback').show();
+                    }
+                }
+            }
+        }
+    }
+});
+
+function prepareNextTrial() {
+    $('#feedback').hide();
+    $('#stimulus').hide();
+
+    cur_trial_idx++;
+
+    if (cur_trial_idx >= n_trials) {  // end of trials
+        $('#submit_data_notice').show();
+
+        $('#input_trial_ids').val(trial_ids.join());
+        $('#input_responses').val(response_keys.join());
+        $('#input_response_times').val(response_times.join());
+        $('#input_response_correct').val(response_correct.join());
+
+        $('.otree-btn-next').click();
+    } else {
+        advanceProgressBar();
+
+        setTimeout(function () {
+            nextTrial();
+        }, {{ Constants.next_trial_delay_ms }});
+    }
+}
+
+function nextTrial() {
+    var trial = trials[cur_trial_idx];
+    $('#stimulus').prop('class', 'class ' + trial[2]).text(trial[1]).show();
+    input_start_time = new Date().getTime();
+}
+
+function advanceProgressBar() {
+    var progress_pct = (cur_trial_idx+1) / n_trials * 100;
+    $('#progress_bar').css('width', progress_pct + '%');
+}
+
+{% if debug %}
+    function randomInt(min, maxExclusive) {
+        return min + Math.floor(Math.random() * maxExclusive);
+    }
+
+    function randomChoice(arr) {
+        var idx = randomInt(0, arr.length);
+        return arr[idx];
+    }
+
+    function debugRunBlock() {
+        $('#submit_data_notice').show();
+
+        trial_ids = [];
+        response_keys = [];
+        response_times = [];
+        response_correct = [];
+        var i;
+        for (i = 0; i < n_trials; i++) {
+            trial_ids.push(trials[i][0]);
+            response_keys.push(randomChoice(['KeyI', 'KeyE']));
+            response_times.push(randomInt(100, 1100));
+            response_correct.push(randomChoice([0, 1]));
+        }
+
+        $('#input_trial_ids').val(trial_ids.join());
+        $('#input_responses').val(response_keys.join());
+        $('#input_response_times').val(response_times.join());
+        $('#input_response_correct').val(response_correct.join());
+
+        $('.otree-btn-next').click();
+    }
+{% endif %}
+
+</script>
+
+{% endblock %}

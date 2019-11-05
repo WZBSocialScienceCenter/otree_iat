@@ -1,0 +1,59 @@
+{% extends "iat/Page.html" %}
+{% load otree static %}
+
+{% block title %}{% endblock %}
+
+{% block app_styles %}
+
+{{ block.super }}
+
+<style>
+
+table.stimuli {
+    margin-bottom: 1em;
+}
+
+table.stimuli td, table.stimuli th {
+    border: 1px solid gray;
+    border-collapse: collapse;
+    padding: 0.2em;
+}
+
+table.stimuli th {
+    background: lightgray;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+    <p>
+        We will show you several words that you should assign to the respective categories.
+
+        Please press either the key <span class="key">{{ Constants.capture_keycodes.left.1 }}</span> or the key
+        <span class="key">{{ Constants.capture_keycodes.right.1 }}</span> on your keyboard.<br>
+        You should assign the following words to the following categories:
+    </p>
+
+    <table class="stimuli">
+        <tr>
+            <th>Category</th>
+            <th>Word</th>
+        </tr>
+        {% for stim in stimuli %}
+            <tr>
+                <td>{{ stim.label }}</td>
+                <td>{{ stim.values }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <p>
+        There are {{ Constants.num_rounds }} parts for which the instructions change. Please stay alert!
+    </p>
+
+    {% next_button %}
+
+{% endblock %}
