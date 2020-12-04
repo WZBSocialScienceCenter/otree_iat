@@ -9,12 +9,16 @@ on collection dynamic data with oTree using the package otreeutils [2].
 
 November 2019
 Markus Konrad <markus.konrad@wzb.eu>
+
+Updated December 2020
+Christoph Semken <dev@csemken.eu>
 """
 
 import random
 
 # required for custom data models:
 from otree.db.models import Model, ForeignKey
+from otree.export import sanitize_for_csv
 
 from otree.api import (
     models, widgets, BaseConstants, BaseSubsession, BaseGroup, BasePlayer,
@@ -207,3 +211,15 @@ class Trial(Model):
     response_time_ms = models.IntegerField()  # time it took until key was pressed since word/name was shown
 
     player = ForeignKey(Player, on_delete=models.CASCADE)  # make a 1:n relationship between Player and Trial
+
+
+def custom_export(players):
+    """
+    Export all IAT trials together with the standard fields `session` and `participant_code`
+    """
+    fields_to_export = ['block', 'trial', 'stimulus', 'stimulus_class', 'stimulus_level',
+                        'response_key', 'response_correct', 'response_time_ms']
+    yield ['session', 'participant_code', 'block'] + fields_to_export
+    for trial in Trial.objects.all():
+        yield [trial.player.session.code, trial.player.participant.code, trial.block] \
+            + [sanitize_for_csv(getattr(trial, f)) for f in fields_to_export]

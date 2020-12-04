@@ -6,8 +6,6 @@ November 2019, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Cen
 
 This repository contains an application for [oTree](http://www.otree.org/) ([Chen et al. 2016](http://dx.doi.org/10.1016/j.jbef.2015.12.001)) which implements the Implicit Association Test (IAT) experiment ([Greenwald et al. 1998](https://psycnet.apa.org/buy/1998-02892-004)).
 
-Makes use of the [otreeutils](https://github.com/WZBSocialScienceCenter/otreeutils) package ([Konrad 2018](https://doi.org/10.1016/j.jbef.2018.10.006)).
-
 **Trial block introduction:**
 
 ![trial block intro](_doc_imgs/iat1.png)
@@ -62,12 +60,7 @@ The test is then implemented in `IATPage`, especially in the JavaScript function
 
 ## Data export
 
-Since the measurements are stored using the custom data model `Trials` (see [this blog post](https://datascience.blog.wzb.eu/2016/10/31/using-custom-data-models-in-otree/) or [Konrad 2018](https://doi.org/10.1016/j.jbef.2018.10.006) for more on custom data models with oTree), the data is not exported automatically using oTree's data export page. However, two methods are provided to obtain the data in hierarchically structured JSON format:
-
-1. You can access the page `https://<SERVER>/custom_export/` (e.g. `http://localhost:8000/custom_export/` on a local development machine) which, after logging in, lets you download the data.
-2. You can use the `data_exporter.py` script, e.g. by executing `python data_exporter.py my_data.json` in the terminal, which will store the JSON data to `my_data.json`.
-
-For later processing of the JSON data, you may use the `jsonlite` package for R or the built-in `json` module in Python.
+If you have at least otree 3.0.0 you can export the data from the Data page, via the _iat (custom)_ links.
 
 ## Tests
 
