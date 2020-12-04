@@ -50,10 +50,5 @@ DEMO_PAGE_INTRO_HTML = """ """
 
 SECRET_KEY = '<SET_KEY_HERE>'
 
-# custom URLs / routing channels for export / data monitor with custom data models and otreeutils
-
-ROOT_URLCONF = 'urls'
-CHANNEL_ROUTING = 'routing.channel_routing'
-
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
-INSTALLED_APPS = ['otree', 'otreeutils']
+INSTALLED_APPS = ['otree']

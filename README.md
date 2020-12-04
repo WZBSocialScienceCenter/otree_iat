@@ -29,8 +29,7 @@ Makes use of the [otreeutils](https://github.com/WZBSocialScienceCenter/otreeuti
 ## Requirements
 
 - Python 3.5 or higher (tested with Python 3.6)
-- otree 2.1.41
-- otreeutils 0.9.1
+- otree 2.1.41 or higher
 
 You can install the exact requirements using *pip*: `pip install -r requirements.txt`
 

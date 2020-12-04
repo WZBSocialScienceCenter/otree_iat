@@ -206,17 +206,4 @@ class Trial(Model):
     response_correct = models.BooleanField()  # records whether response was correct
     response_time_ms = models.IntegerField()  # time it took until key was pressed since word/name was shown
 
-    player = ForeignKey(Player)               # make a 1:n relationship between Player and Trial
-
-    class CustomModelConf:
-        """
-        Configuration for otreeutils admin extensions.
-        """
-        data_view = {  # define this attribute if you want to include this model in the live data view
-            'exclude_fields': ['player'],
-            'link_with': 'player'
-        }
-        export_data = {  # define this attribute if you want to include this model in the data export
-            'exclude_fields': ['player_id'],
-            'link_with': 'player'
-        }
+    player = ForeignKey(Player, on_delete=models.CASCADE)  # make a 1:n relationship between Player and Trial
