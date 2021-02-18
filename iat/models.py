@@ -2,10 +2,9 @@
 Implicit Association Test (IAT) experiment -- models.
 
 Dynamic data points for IAT trials are collected in custom data model "Trial". See Konrad 2018 [1] for an article
-on collection dynamic data with oTree using the package otreeutils [2].
+on collection dynamic data with oTree.
 
 [1] https://doi.org/10.1016/j.jbef.2018.10.006
-[2] https://github.com/WZBSocialScienceCenter/otreeutils
 
 November 2019
 Markus Konrad <markus.konrad@wzb.eu>

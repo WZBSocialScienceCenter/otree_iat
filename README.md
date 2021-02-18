@@ -26,8 +26,10 @@ This repository contains an application for [oTree](http://www.otree.org/) ([Che
 
 ## Requirements
 
-- tested with Python 3.6 to Python 3.9 (may work with other Python **3** versions)
-- tested with otree 3.3.0 to otree 3.3.11 (may work with **higher** versions)
+- tested with Python 3.7 to Python 3.9
+- tested with otree 3.3.0 to otree 3.3.11
+
+oTree IAT may work with higher versions than specified here, but this is untested. 
 
 You can install the exact requirements using *pip*: `pip install -r requirements.txt`
 
@@ -62,21 +64,29 @@ The test is then implemented in `IATPage`, especially in the JavaScript function
 
 ## Data export
 
-You can export the data from the "Data" page, via the *iat (custom)* links.
+You can export the data from the "Data" page (`https://<yourserver>/export`) via the *iat (custom)* links.
 
 ## Tests
 
 Automated tests are implemented in `iat/tests.py` and can be run via `otree test iat`.
 
+Testing multiple combinations of Python and oTree versions is done using [tox](https://tox.readthedocs.io/). You can install the package *tox* via pip and then run `tox` on the command line.
+
 ## Code changes
 
-### v1.0.0 (oTree 2.1.x)
+### 2021-02-18: v1.1.0 (oTree 3.3.x)
+
+- added compatibility with oTree 3.3.x and removed dependency to otreeutils ([PR #3](https://github.com/WZBSocialScienceCenter/otree_iat/pull/3) – thanks to [Christoph Semken](https://github.com/csemken))
+- added tox integration for testing multiple Python/oTree versions
+
+### 2019-11-05: v1.0.0 (oTree 2.1.x)
 
 - initial release
 
 ## Authors
 
-TODO
+- [Markus Konrad](https://github.com/internaut) <markus.konrad@wzb.eu>
+- [Christoph Semken](https://github.com/csemken) <dev@csemken.eu>
 
 ## License
 
