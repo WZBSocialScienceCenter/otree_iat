@@ -1,6 +1,6 @@
 # Implicit Association Test (IAT) experiment for oTree
 
-November 2019, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Center](https://wzb.eu)
+February 2020, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Center](https://wzb.eu)
 
 ## Introduction
 
@@ -26,10 +26,12 @@ This repository contains an application for [oTree](http://www.otree.org/) ([Che
 
 ## Requirements
 
-- Python 3.5 or higher (tested with Python 3.6)
-- otree 2.1.41 or higher
+- tested with Python 3.6 to Python 3.9 (may work with other Python **3** versions)
+- tested with otree 3.3.0 to otree 3.3.11 (may work with **higher** versions)
 
 You can install the exact requirements using *pip*: `pip install -r requirements.txt`
+
+If you want to use oTree IAT with an older version of oTree, you may try a previous release as listed under *Releases* on the right side. To know which version of oTree IAT works with which version of oTree, see the *Changes* section below.
 
 ## Configuration
 
@@ -60,11 +62,21 @@ The test is then implemented in `IATPage`, especially in the JavaScript function
 
 ## Data export
 
-If you have at least otree 3.0.0 you can export the data from the Data page, via the _iat (custom)_ links.
+You can export the data from the "Data" page, via the *iat (custom)* links.
 
 ## Tests
 
 Automated tests are implemented in `iat/tests.py` and can be run via `otree test iat`.
+
+## Code changes
+
+### v1.0.0 (oTree 2.1.x)
+
+- initial release
+
+## Authors
+
+TODO
 
 ## License
 
