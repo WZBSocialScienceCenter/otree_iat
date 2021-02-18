@@ -2,19 +2,22 @@
 Implicit Association Test (IAT) experiment -- models.
 
 Dynamic data points for IAT trials are collected in custom data model "Trial". See Konrad 2018 [1] for an article
-on collection dynamic data with oTree using the package otreeutils [2].
+on collection dynamic data with oTree.
 
 [1] https://doi.org/10.1016/j.jbef.2018.10.006
-[2] https://github.com/WZBSocialScienceCenter/otreeutils
 
 November 2019
 Markus Konrad <markus.konrad@wzb.eu>
+
+Updated December 2020
+Christoph Semken <dev@csemken.eu>
 """
 
 import random
 
 # required for custom data models:
 from otree.db.models import Model, ForeignKey
+from otree.export import sanitize_for_csv
 
 from otree.api import (
     models, widgets, BaseConstants, BaseSubsession, BaseGroup, BasePlayer,
@@ -206,17 +209,16 @@ class Trial(Model):
     response_correct = models.BooleanField()  # records whether response was correct
     response_time_ms = models.IntegerField()  # time it took until key was pressed since word/name was shown
 
-    player = ForeignKey(Player)               # make a 1:n relationship between Player and Trial
+    player = ForeignKey(Player, on_delete=models.CASCADE)  # make a 1:n relationship between Player and Trial
 
-    class CustomModelConf:
-        """
-        Configuration for otreeutils admin extensions.
-        """
-        data_view = {  # define this attribute if you want to include this model in the live data view
-            'exclude_fields': ['player'],
-            'link_with': 'player'
-        }
-        export_data = {  # define this attribute if you want to include this model in the data export
-            'exclude_fields': ['player_id'],
-            'link_with': 'player'
-        }
+
+def custom_export(players):
+    """
+    Export all IAT trials together with the standard fields `session` and `participant_code`
+    """
+    fields_to_export = ['block', 'trial', 'stimulus', 'stimulus_class', 'stimulus_level',
+                        'response_key', 'response_correct', 'response_time_ms']
+    yield ['session', 'participant_code', 'block'] + fields_to_export
+    for trial in Trial.objects.all():
+        yield [trial.player.session.code, trial.player.participant.code, trial.block] \
+            + [sanitize_for_csv(getattr(trial, f)) for f in fields_to_export]
