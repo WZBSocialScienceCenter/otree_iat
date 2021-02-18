@@ -20,7 +20,6 @@ This repository contains an application for [oTree](http://www.otree.org/) ([Che
 - precise measurement of responses in milliseconds
 - progress bar showing advancement of trials for each participant 
 - each measurement is stored individually in the database
-- live view of measurements during experiment in oTree's data view 
 - requires keyboard for responses but may be extended to work on mobile devices as well
 - results are transferred to server at the end of each *round* (each round or *block* consists of several trials), *not* after each trial
 
