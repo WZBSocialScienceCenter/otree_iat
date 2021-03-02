@@ -1,6 +1,6 @@
 # Implicit Association Test (IAT) experiment for oTree
 
-February 2020, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Center](https://wzb.eu)
+March 2021, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Center](https://wzb.eu)
 
 ## Introduction
 
@@ -22,15 +22,19 @@ This repository contains an application for [oTree](http://www.otree.org/) ([Che
 - each measurement is stored individually in the database
 - requires keyboard for responses but may be extended to work on mobile devices as well
 - results are transferred to server at the end of each *round* (each round or *block* consists of several trials), *not* after each trial
+- optional: live view of measurements during experiment in oTree's data view 
+
 
 ## Requirements
 
-- tested with Python 3.7 to Python 3.9
+- tested with Python 3.7 and Python 3.8
 - tested with otree 3.3.0 to otree 3.3.11
 
 oTree IAT may work with higher versions than specified here, but this is untested. 
 
 You can install the exact requirements using *pip*: `pip install -r requirements.txt`
+
+If you want to see live view of measurements during the experiment in the "data" view of oTree's admin panel, you additional need to install *[otreeutils](https://github.com/WZBSocialScienceCenter/otreeutils)* version 0.10.0 or newer: `pip install otreeutils[admin]`.
 
 If you want to use oTree IAT with an older version of oTree, you may try a previous release as listed under *Releases* on the right side. To know which version of oTree IAT works with which version of oTree, see the *Changes* section below.
 
@@ -75,7 +79,7 @@ Testing multiple combinations of Python and oTree versions is done using [tox](h
 
 ### 2021-02-18: v1.1.0 (oTree 3.3.x)
 
-- added compatibility with oTree 3.3.x and removed dependency to otreeutils ([PR #3](https://github.com/WZBSocialScienceCenter/otree_iat/pull/3) – thanks to [Christoph Semken](https://github.com/csemken))
+- added compatibility with oTree 3.3.x; dependency to otreeutils is now optional ([PR #3](https://github.com/WZBSocialScienceCenter/otree_iat/pull/3) – thanks to [Christoph Semken](https://github.com/csemken))
 - added tox integration for testing multiple Python/oTree versions
 
 ### 2019-11-05: v1.0.0 (oTree 2.1.x)
