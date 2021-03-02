@@ -1,4 +1,6 @@
 from os import environ
+import importlib.util
+
 
 if environ.get('OTREE_PRODUCTION') not in {None, '', '0'}:
     DEBUG = False
@@ -52,3 +54,9 @@ SECRET_KEY = '<SET_KEY_HERE>'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
 INSTALLED_APPS = ['otree']
+
+if importlib.util.find_spec('otreeutils'):
+    INSTALLED_APPS.append('otreeutils')
+
+    if importlib.util.find_spec('pandas'):
+        ROOT_URLCONF = 'iat.urls'

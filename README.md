@@ -1,10 +1,12 @@
 # Implicit Association Test (IAT) experiment for oTree
 
-February 2020, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Center](https://wzb.eu)
+March 2021, Markus Konrad <markus.konrad@wzb.eu> / [Berlin Social Science Center](https://wzb.eu)
 
 ## Introduction
 
 This repository contains an application for [oTree](http://www.otree.org/) ([Chen et al. 2016](http://dx.doi.org/10.1016/j.jbef.2015.12.001)) which implements the Implicit Association Test (IAT) experiment ([Greenwald et al. 1998](https://psycnet.apa.org/buy/1998-02892-004)).
+
+Optionally makes use of the [otreeutils](https://github.com/WZBSocialScienceCenter/otreeutils) package ([Konrad 2018](https://doi.org/10.1016/j.jbef.2018.10.006)).
 
 **Trial block introduction:**
 
@@ -22,15 +24,19 @@ This repository contains an application for [oTree](http://www.otree.org/) ([Che
 - each measurement is stored individually in the database
 - requires keyboard for responses but may be extended to work on mobile devices as well
 - results are transferred to server at the end of each *round* (each round or *block* consists of several trials), *not* after each trial
+- optional: live view of measurements during experiment in oTree's data view 
+
 
 ## Requirements
 
-- tested with Python 3.7 to Python 3.9
+- tested with Python 3.7 and Python 3.8
 - tested with otree 3.3.0 to otree 3.3.11
 
 oTree IAT may work with higher versions than specified here, but this is untested. 
 
 You can install the exact requirements using *pip*: `pip install -r requirements.txt`
+
+If you want to see live view of measurements during the experiment in the "data" view of oTree's admin panel, you additional need to install *[otreeutils](https://github.com/WZBSocialScienceCenter/otreeutils)* version 0.10.0 or newer: `pip install otreeutils[admin]`.
 
 If you want to use oTree IAT with an older version of oTree, you may try a previous release as listed under *Releases* on the right side. To know which version of oTree IAT works with which version of oTree, see the *Changes* section below.
 
@@ -63,7 +69,9 @@ The test is then implemented in `IATPage`, especially in the JavaScript function
 
 ## Data export
 
-You can export the data from the "Data" page (`https://<yourserver>/export`) via the *iat (custom)* links.
+You can export the data from the "Data" page (`https://<yourserver>/export`) via the *iat (custom)* links. If you have *otreeutils* installed, you can also use the `data_exporter.py` script by executing `python data_exporter.py my_data.json` in the terminal, which will store all collected data in JSON format to `my_data.json`.
+
+For later processing of the JSON data, you may use the `jsonlite` package for R or the built-in `json` module in Python.
 
 ## Tests
 
@@ -73,9 +81,13 @@ Testing multiple combinations of Python and oTree versions is done using [tox](h
 
 ## Code changes
 
+### 2021-03-03: v1.1.1 (oTree 3.3.x)
+
+- dependency to otreeutils is now optional (brings back session data live view via otreeutils 0.10.0)
+
 ### 2021-02-18: v1.1.0 (oTree 3.3.x)
 
-- added compatibility with oTree 3.3.x and removed dependency to otreeutils ([PR #3](https://github.com/WZBSocialScienceCenter/otree_iat/pull/3) – thanks to [Christoph Semken](https://github.com/csemken))
+- added compatibility with oTree 3.3.x ([PR #3](https://github.com/WZBSocialScienceCenter/otree_iat/pull/3) – thanks to [Christoph Semken](https://github.com/csemken))
 - added tox integration for testing multiple Python/oTree versions
 
 ### 2019-11-05: v1.0.0 (oTree 2.1.x)
